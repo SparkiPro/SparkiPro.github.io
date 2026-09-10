@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
+<title>Спарки — спроси что угодно</title>
+<meta name="description" content="Бесплатный ИИ-помощник в браузере: задавай вопросы, присылай фото — разберёмся. Без API-ключей.">
+
+<!-- PWA -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#16305C">
+<link rel="icon" href="icons/icon-192.png">
+
+<!-- iOS: делает страницу устанавливаемой как отдельное приложение -->
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Спарки">
+<meta name="mobile-web-app-capable" content="yes">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="app">
+
+  <!-- Шапка -->
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor"><path d="M13.2 1.6 5.8 13.4h4.4l-1.6 9 8.6-12.6h-4.6l1.6-8.2Z"/></svg>
+      </span>
+      <span class="brand-name">Спарки</span>
+    </div>
+    <div class="topbar-actions">
+      <button id="settingsBtn" class="icon-btn" type="button" aria-label="Настройки" title="Настройки">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1.04 1.56V21a2 2 0 1 1-4 0v-.09A1.7 1.7 0 0 0 9 19.37a1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.7 1.7 0 0 0 4.63 15a1.7 1.7 0 0 0-1.56-1.04H3a2 2 0 1 1 0-4h.09A1.7 1.7 0 0 0 4.63 9a1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.7 1.7 0 0 0 9 4.63a1.7 1.7 0 0 0 1.04-1.56V3a2 2 0 1 1 4 0v.09A1.7 1.7 0 0 0 15 4.63a1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.7 1.7 0 0 0 19.37 9a1.7 1.7 0 0 0 1.56 1.04H21a2 2 0 1 1 0 4h-.09A1.7 1.7 0 0 0 19.4 15Z"/></svg>
+      </button>
+      <button id="clearBtn" class="icon-btn" type="button" aria-label="Новый разговор" title="Новый разговор">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- Панель настроек -->
+  <div id="settingsPanel" class="settings-panel" hidden>
+    <label class="settings-row">
+      <span>Модель</span>
+      <select id="modelSelect">
+        <option value="openai">GPT (по умолчанию)</option>
+        <option value="openai-large">GPT — мощнее (может отвечать медленнее)</option>
+        <option value="claude-hybridspace">Claude</option>
+      </select>
+    </label>
+    <p class="settings-hint">Модели отвечают чуть по-разному. Если одна не грузится — попробуйте другую.</p>
+  </div>
+
+  <!-- Лог диалога -->
+  <main id="chatLog" class="chat-log" aria-live="polite">
+    <div id="emptyState" class="empty-state">
+      <h1>Спроси что угодно.<br>Пришли фото — <span class="mark">разберёмся</span>.</h1>
+      <p>Работает бесплатно, прямо в браузере. Никаких ключей и настроек.</p>
+      <div class="suggestions">
+        <button class="chip" type="button" data-prompt="Объясни просто и по шагам: ">Объясни по шагам</button>
+        <button class="chip" type="button" data-prompt="Помоги решить задачу на фото">Реши задачу на фото</button>
+        <button class="chip" type="button" data-prompt="Проверь текст на ошибки: ">Проверь текст</button>
+      </div>
+    </div>
+  </main>
+
+  <!-- Плашка про установку (iOS) -->
+  <div id="installTip" class="install-tip" hidden>
+    <span>Чтобы добавить на главный экран: нажмите «Поделиться» <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px"><path d="M12 16V4M7 8l5-5 5 5"/><rect x="4" y="14" width="16" height="7" rx="2"/></svg> → «На экран «Домой»».</span>
+    <button id="installTipClose" class="text-btn" type="button" aria-label="Закрыть подсказку">Понятно</button>
+  </div>
+
+  <!-- Стейджинг фото перед отправкой -->
+  <div id="imageStage" class="image-stage" hidden>
+    <div class="image-stage-preview">
+      <img id="imageStageImg" alt="Выбранное фото">
+    </div>
+    <button id="imageStageRemove" class="icon-btn small" type="button" aria-label="Убрать фото">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+    </button>
+  </div>
+
+  <!-- Панель ввода -->
+  <form id="composer" class="composer" autocomplete="off">
+    <button id="attachBtn" class="icon-btn attach-btn" type="button" aria-label="Прикрепить фото" title="Прикрепить фото">
+      <svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h3l1.5-2h7L17 7h3a1 1 0 0 1 1 1v11a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1Z"/><circle cx="12" cy="13" r="3.5"/></svg>
+    </button>
+    <input id="photoInput" type="file" accept="image/*" capture="environment" hidden>
+    <textarea id="textInput" class="text-input" rows="1" placeholder="Напиши сообщение…" aria-label="Сообщение"></textarea>
+    <button id="sendBtn" class="send-btn" type="submit" aria-label="Отправить" title="Отправить">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M13.2 1.6 5.8 13.4h4.4l-1.6 9 8.6-12.6h-4.6l1.6-8.2Z"/></svg>
+    </button>
+  </form>
+
+</div>
+
+<script src="app.js" defer></script>
+</body>
+</html>
